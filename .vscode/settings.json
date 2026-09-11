@@ -1,0 +1,24 @@
+{
+    // CMake Tools drives configure/build through CMakePresets.json.
+    // Pick the preset once via "CMake: Select Configure Preset" (Ctrl+Shift+P).
+    "cmake.configureOnOpen": true,
+    "cmake.buildBeforeRun": true,
+
+    // After every successful configure, copy the active preset's
+    // compile_commands.json to the workspace root, where clangd picks it up
+    // automatically (ancestor-directory lookup). Reflects the LAST configured
+    // preset; gitignored.
+    "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json",
+
+    // IntelliSense: CMake Tools hands cpptools the compile_commands.json of
+    // the active preset -- include paths and defines included.
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+
+    "files.associations": {},
+    "search.exclude": {
+        "**/out": true
+    },
+    "files.watcherExclude": {
+        "**/out": true
+    }
+}

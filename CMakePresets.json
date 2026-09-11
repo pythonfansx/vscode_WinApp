@@ -1,0 +1,83 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+            }
+        },
+
+        {
+            "name": "msvc-base",
+            "hidden": true,
+            "inherits": "base",
+            "toolchainFile": "${sourceDir}/cmake/toolchains/msvc.cmake"
+        },
+        {
+            "name": "msvc-debug",
+            "inherits": "msvc-base",
+            "displayName": "MSVC x64 · cl.exe · Debug",
+            "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+        },
+        {
+            "name": "msvc-release",
+            "inherits": "msvc-base",
+            "displayName": "MSVC x64 · cl.exe · Release",
+            "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+        },
+
+        {
+            "name": "clang-base",
+            "hidden": true,
+            "inherits": "base",
+            "toolchainFile": "${sourceDir}/cmake/toolchains/clang.cmake"
+        },
+        {
+            "name": "clang-debug",
+            "inherits": "clang-base",
+            "displayName": "Clang x64 · clang-cl.exe · Debug",
+            "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+        },
+        {
+            "name": "clang-release",
+            "inherits": "clang-base",
+            "displayName": "Clang x64 · clang-cl.exe · Release",
+            "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+        },
+
+        {
+            "name": "arkari-base",
+            "hidden": true,
+            "inherits": "base",
+            "toolchainFile": "${sourceDir}/cmake/toolchains/arkari.cmake"
+        },
+        {
+            "name": "arkari-debug",
+            "inherits": "arkari-base",
+            "displayName": "Arkari x64 · clang-cl.exe (obf) · Debug",
+            "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+        },
+        {
+            "name": "arkari-release",
+            "inherits": "arkari-base",
+            "displayName": "Arkari x64 · clang-cl.exe (obf) · Release",
+            "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+        }
+    ],
+
+    "buildPresets": [
+        { "name": "msvc-debug",    "configurePreset": "msvc-debug" },
+        { "name": "msvc-release",  "configurePreset": "msvc-release" },
+        { "name": "clang-debug",   "configurePreset": "clang-debug" },
+        { "name": "clang-release", "configurePreset": "clang-release" },
+        { "name": "arkari-debug",   "configurePreset": "arkari-debug" },
+        { "name": "arkari-release", "configurePreset": "arkari-release" }
+    ]
+}

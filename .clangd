@@ -1,0 +1,12 @@
+# clangd configuration for the WinApp template.
+#
+# compile_commands.json is copied to the workspace root after every successful
+# configure/build (.vscode/settings.json -> cmake.copyCompileCommands, plus a
+# CMake ALL target for CLI builds); clangd finds it through ancestor-directory
+# lookup. It reflects the LAST configured/built preset (msvc-* / clang-* /
+# arkari-*).
+CompileFlags:
+  Add:
+    # Entries compiled by cl.exe need the MSVC dialect: otherwise _MSC_VER is
+    # undefined and Windows header blocks get #ifdef'd away.
+    - --driver-mode=cl

@@ -1,0 +1,27 @@
+{
+    // --------------------------------------------------------------
+    // IntelliSense fallback for header browsing before the first
+    // configure succeeds. Normally CMake Tools feeds cpptools from the
+    // active preset's compile_commands.json (see settings.json); adjust the
+    // versions below only if you rely on this fallback.
+    // --------------------------------------------------------------
+    "configurations": [
+        {
+            "name": "WinApp (x64)",
+            "intelliSenseMode": "windows-msvc-x64",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "includePath": [
+                "${workspaceFolder}/src",
+                "${workspaceFolder}/src/corelib",
+                "D:/Program Files/Microsoft Visual Studio/2022/Professional/VC/Tools/MSVC/14.44.35207/include",
+                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/ucrt",
+                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/um",
+                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared",
+                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/winrt",
+                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/cppwinrt"
+            ]
+        }
+    ],
+    "version": 4
+}

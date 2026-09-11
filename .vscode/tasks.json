@@ -1,0 +1,106 @@
+{
+    "version": "2.0.0",
+    "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "clear": false
+    },
+    "tasks": [
+        {
+            "label": "Configure: msvc-debug",
+            "detail": "cmake --preset msvc-debug (cl.exe + Ninja)",
+            "type": "shell",
+            "command": "cmake --preset msvc-debug",
+            "problemMatcher": []
+        },
+        {
+            "label": "Configure: clang-debug",
+            "detail": "cmake --preset clang-debug (clang-cl.exe + Ninja)",
+            "type": "shell",
+            "command": "cmake --preset clang-debug",
+            "problemMatcher": []
+        },
+        {
+            "label": "Configure: arkari-debug",
+            "detail": "cmake --preset arkari-debug (Arkari clang-cl + Ninja)",
+            "type": "shell",
+            "command": "cmake --preset arkari-debug",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build: msvc-debug",
+            "detail": "cl.exe + Ninja (Debug)",
+            "type": "shell",
+            "command": "cmake --build --preset msvc-debug",
+            "group": { "kind": "build", "isDefault": true },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build: msvc-release",
+            "detail": "cl.exe + Ninja (Release)",
+            "type": "shell",
+            "command": "cmake --build --preset msvc-release",
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build: clang-debug",
+            "detail": "clang-cl.exe + Ninja (Debug)",
+            "type": "shell",
+            "command": "cmake --build --preset clang-debug",
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build: clang-release",
+            "detail": "clang-cl.exe + Ninja (Release)",
+            "type": "shell",
+            "command": "cmake --build --preset clang-release",
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build: arkari-debug",
+            "detail": "Arkari clang-cl.exe + Ninja (Debug)",
+            "type": "shell",
+            "command": "cmake --build --preset arkari-debug",
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build: arkari-release",
+            "detail": "Arkari clang-cl.exe + Ninja (Release)",
+            "type": "shell",
+            "command": "cmake --build --preset arkari-release",
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Clean: msvc-debug",
+            "type": "shell",
+            "command": "cmake --build --preset msvc-debug --target clean",
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean: clang-debug",
+            "type": "shell",
+            "command": "cmake --build --preset clang-debug --target clean",
+            "problemMatcher": []
+        },
+        {
+            "label": "Install: msvc-debug",
+            "detail": "exe + libs into out/install/msvc-debug",
+            "type": "shell",
+            "command": "cmake --install out/build/msvc-debug",
+            "problemMatcher": []
+        },
+        {
+            "label": "Install: clang-debug",
+            "type": "shell",
+            "command": "cmake --install out/build/clang-debug",
+            "problemMatcher": []
+        }
+    ]
+}

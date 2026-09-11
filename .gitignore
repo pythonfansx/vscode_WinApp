@@ -1,0 +1,17 @@
+# Build output (CMake presets put everything under out/); root-anchored.
+out/
+/build/
+
+# CMake user-local files
+CMakeUserPresets.json
+compile_commands.json
+
+# VS solution noise (if opened with Visual Studio alongside)
+.vs/
+*.user
+
+# Editor noise
+*.code-workspace
+.history/
+
+# NOTE: .vscode/ is intentionally committed (project template settings).
