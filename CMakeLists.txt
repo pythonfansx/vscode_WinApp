@@ -17,6 +17,24 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # -----------------------------------------------------------------------------
 # Static / dynamic linking (freely configurable)
 # -----------------------------------------------------------------------------
+# On this branch the Qt kit is chosen FIRST (it may force the CRT choice to
+# match how the kit was built), then the runtime mapping is evaluated.
+set(APP_QT_LINK "static" CACHE STRING "Qt kit linkage: static or dynamic")
+set_property(CACHE APP_QT_LINK PROPERTY STRINGS static dynamic)
+set(APP_QT_ROOT "D:/Qt/5.15.2" CACHE PATH
+    "Qt root containing msvc2019_64 and msvc2019_64_static")
+
+if(APP_QT_LINK STREQUAL "static")
+    set(_qt_kit "${APP_QT_ROOT}/msvc2019_64_static")
+    # Static Qt is built against the static CRT; force /MT to avoid LNK2038.
+    set(APP_RUNTIME_LINK "static" CACHE STRING "" FORCE)
+else()
+    set(_qt_kit "${APP_QT_ROOT}/msvc2019_64")
+    # The shared kit is built against /MD; force the dynamic CRT to match.
+    set(APP_RUNTIME_LINK "dynamic" CACHE STRING "" FORCE)
+endif()
+list(PREPEND CMAKE_PREFIX_PATH "${_qt_kit}")
+
 # 1) C runtime linkage:  static (/MT, /MTd)  vs  dynamic (/MD, /MDd).
 #    Maps onto CMAKE_MSVC_RUNTIME_LIBRARY (CMP0091, NEW for >= 3.15 policies).
 set(APP_RUNTIME_LINK "static" CACHE STRING "C runtime linkage: static (/MT) or dynamic (/MD)")
@@ -32,12 +50,16 @@ endif()
 option(BUILD_SHARED_LIBS "Build project libraries as DLLs instead of static libs" OFF)
 
 # -----------------------------------------------------------------------------
-# GUI variants live on their own branches (same convention as the
-# vscode_WinDriver template):
-#
-#   main          Win32 GUI base (this branch)
-#   template/qt   Qt 6 Widgets edition (-DCMAKE_PREFIX_PATH=<Qt kit>)
-#
+# Qt (this branch): the kit selected above is resolved and consumed here.
+#   APP_QT_LINK static  -> everything folded into the exe (QWindowsIntegration
+#                          plugin imported in src/app/main.cpp)
+#   APP_QT_LINK dynamic -> exe depends on Qt5*.dll; deploy with windeployqt
+# -----------------------------------------------------------------------------
+
+find_package(Qt5 5.15 REQUIRED COMPONENTS Core Gui Widgets)
+message(STATUS "Qt5      : ${Qt5Core_VERSION} @ ${_qt_kit} (${APP_QT_LINK})")
+set(CMAKE_AUTOMOC ON)
+
 # -----------------------------------------------------------------------------
 add_subdirectory(src)
 

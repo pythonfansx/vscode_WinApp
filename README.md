@@ -1,8 +1,24 @@
+# vscode_WinApp — template/qt 分支（Qt Widgets 模板）
+
+> 本分支为 **Qt 版 GUI 模板**：`APP_QT_LINK=static/dynamic` 一键切换 Qt 静态 kit（`msvc2019_64_static`，默认）
+> 与动态 kit（`msvc2019_64`），CRT 跟随 kit 自动配对（静态 /MT、动态 /MD），cl.exe / clang-cl.exe 双链验证通过。
+> Win32 基础模板见 `main`。
+
+| `APP_QT_LINK` | kit | CRT（自动强制） | 实测产物 |
+|---|---|---|---|
+| `static`（默认） | `msvc2019_64_static` | `/MT` | 37.9MB 单文件 exe，导入表仅系统库（Qt 与 CRT 全折入） |
+| `dynamic` | `msvc2019_64` | `/MD` | exe 导入 `Qt5Core/Qt5Widgets.dll + MSVCP140/VCRUNTIME140 + api-ms-win-crt-*`（windeployqt 部署） |
+
+```powershell
+cmake --preset msvc-debug                                   # 静态 Qt 单文件
+cmake --preset msvc-release -DAPP_QT_LINK=dynamic           # 动态 Qt
+```
+自定义 kit：`-DAPP_QT_ROOT=<Qt根>`（含 `msvc2019_64[_static]`）或直接 `CMAKE_PREFIX_PATH`。
+静态 kit 的平台插件由 `src/app/main.cpp` 的 `Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)` 折入；
+注意共享 kit 也导出同名插件 target（指向 DLL），故 `src/CMakeLists.txt` 用 `APP_QT_LINK` 而非
+`if(TARGET ...)` 判静态——后者会把 qwindows.dll 链进链接线（LNK1107）。
+
 # vscode_WinApp
-
-Windows **三环（用户态）应用**模板工程：**CMake + Ninja**，工具链可在 **MSVC (cl.exe) / LLVM (clang-cl.exe) / Arkari（混淆版 clang）** 之间一键切换，全部构建逻辑收拢在独立的 `cmake/` 目录，**静态/动态链接自由配置**，内置 Qt 等第三方框架的快速扩展点。VSCode 打开即识别头文件（含 `.vscode` 配置与 clangd 支持，随仓库提交）。
-
-驱动（ring 0）模板见姊妹仓库 [vscode_WinDriver](https://github.com/pythonfansx/vscode_WinDriver)。
 
 ## 目录结构
 

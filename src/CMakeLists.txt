@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# vscode_WinApp sources: corelib (static/shared switchable) + Win32 GUI app
+# vscode_WinApp sources (template/qt): corelib + Qt Widgets app
 # -----------------------------------------------------------------------------
 
 # --- corelib: BUILD_SHARED_LIBS decides .lib vs .dll ---------------------------
@@ -20,17 +20,26 @@ if(BUILD_SHARED_LIBS)
     target_compile_definitions(corelib INTERFACE WAP_SHARED)
 endif()
 
-# --- app: Win32 GUI executable --------------------------------------------------
-add_executable(WinApp WIN32
+# --- app: Qt Widgets executable --------------------------------------------------
+add_executable(WinAppQt WIN32
     app/main.cpp
 )
-target_link_libraries(WinApp PRIVATE app::corelib)
-
+target_link_libraries(WinAppQt PRIVATE Qt5::Widgets app::corelib)
+# Static kit: import the platform plugin into the executable (see the
+# Q_IMPORT_PLUGIN block in app/main.cpp). NB: the SHARED kit also exposes a
+# Qt5::QWindowsIntegrationPlugin target (pointing at the plugin DLL!) -- never
+# detect "static" via TARGET existence, link it only for the static kit.
+if(APP_QT_LINK STREQUAL "static")
+    target_link_libraries(WinAppQt PRIVATE Qt5::QWindowsIntegrationPlugin)
+endif()
 
 # --- install layout --------------------------------------------------------------
-install(TARGETS WinApp corelib
-    RUNTIME DESTINATION .           # exe (+ dll when BUILD_SHARED_LIBS=ON)
+install(TARGETS WinAppQt corelib
+    RUNTIME DESTINATION .           # exe (+ dlls when BUILD_SHARED_LIBS=ON)
     LIBRARY DESTINATION .
-    ARCHIVE DESTINATION .           # import/static libs
+    ARCHIVE DESTINATION .
 )
 install(FILES corelib/app_core.h DESTINATION include)
+
+# Dynamic kit hint: after install, collect the Qt runtime next to the exe:
+#   windeployqt out/install/<preset>/WinAppQt.exe
