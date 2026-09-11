@@ -26,17 +26,6 @@ add_executable(WinApp WIN32
 )
 target_link_libraries(WinApp PRIVATE app::corelib)
 
-# --- optional Qt variant of the app (quick-extension demo) ---------------------
-# Enabled with -DUSE_QT=ON -DCMAKE_PREFIX_PATH=<Qt kit>; shows how little it
-# takes to grow this template into a Qt application.
-if(USE_QT)
-    find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
-    qt_standard_project_setup()          # Qt 6.7+; otherwise set CMAKE_AUTOMOC etc.
-    add_executable(WinAppQt
-        qt/main.cpp
-    )
-    target_link_libraries(WinAppQt PRIVATE Qt6::Widgets app::corelib)
-endif()
 
 # --- install layout --------------------------------------------------------------
 install(TARGETS WinApp corelib

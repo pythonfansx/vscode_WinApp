@@ -32,13 +32,12 @@ endif()
 option(BUILD_SHARED_LIBS "Build project libraries as DLLs instead of static libs" OFF)
 
 # -----------------------------------------------------------------------------
-# Optional dependencies -- the Qt (or any CMake package) extension point.
-# A GUI variant of the sample app is enabled once Qt6 is found.
+# GUI variants live on their own branches (same convention as the
+# vscode_WinDriver template):
 #
-#   cmake --preset msvc-debug -DCMAKE_PREFIX_PATH="C:/Qt/6.8.0/msvc2022_64"
-# -----------------------------------------------------------------------------
-option(USE_QT "Enable the Qt sample target (needs CMAKE_PREFIX_PATH pointing at a Qt kit)" OFF)
-
+#   main          Win32 GUI base (this branch)
+#   template/qt   Qt 6 Widgets edition (-DCMAKE_PREFIX_PATH=<Qt kit>)
+#
 # -----------------------------------------------------------------------------
 add_subdirectory(src)
 

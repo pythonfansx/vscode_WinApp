@@ -19,10 +19,9 @@ vscode_WinApp/
 │       ├── clang.cmake       # clang-cl.exe + lld-link.exe
 │       └── arkari.cmake      # Arkari clang-cl.exe + lld-link.exe（混淆默认开启）
 ├── src/
-│   ├── CMakeLists.txt        # corelib + WinApp(+可选 WinAppQt) 目标与 install 规则
+│   ├── CMakeLists.txt        # corelib + WinApp 目标与 install 规则
 │   ├── corelib/              # 示例库：BUILD_SHARED_LIBS 决定 .lib / .dll
-│   ├── app/                  # Win32 GUI 样例（弹出构建配置报告）
-│   └── qt/                   # Qt 样例（-DUSE_QT=ON 时参与编译）
+│   └── app/                  # Win32 GUI 样例（弹出构建配置报告）
 └── .vscode/                  # 随仓库提交：IntelliSense、构建任务、推荐扩展
 ```
 
@@ -84,18 +83,15 @@ cmake --preset msvc-release -DAPP_RUNTIME_LINK=dynamic -DBUILD_SHARED_LIBS=ON `
 
 样例程序弹窗即显示当前组合（编译器 / CRT 链接 / 库链接），所见即所得。
 
-## Qt 等框架快速扩展
+## 模板分支（GUI 变体各占一支）
 
-根 CMakeLists 预留 `USE_QT` 扩展点，`src/qt/main.cpp` 为现成样例：
+| 分支 | 内容 |
+|---|---|
+| `main` | Win32 GUI 基础模板（本分支）：corelib + 三工具链 + 静态/动态链接开关 |
+| `template/qt` | Qt Widgets 版：`APP_QT_LINK=static/dynamic` 自控切换 Qt 静态/动态 kit |
 
-```powershell
-cmake --preset msvc-debug -DUSE_QT=ON -DCMAKE_PREFIX_PATH="C:/Qt/6.8.0/msvc2022_64" `
-  && cmake --build --preset msvc-debug
-```
-
-其他框架（vcpkg / FetchContent / NuGet 三方库）同理：在根 CMakeLists 的
-"Optional dependencies" 区域 `find_package` + 在 `src/CMakeLists.txt` 加目标即可。
-Vendored 包可仿照 WinDriver 仓库 `third_party/musa/` 的布局入库管理。
+其他框架（vcpkg / FetchContent / NuGet 三方库）在任一分支上加 `find_package` +
+目标即可；vendored 包可仿照 WinDriver 仓库 `third_party/musa/` 的布局入库管理。
 
 ## VSCode 使用
 
@@ -118,7 +114,7 @@ IntelliSense：cpptools 经 `C_Cpp.default.configurationProvider` 吃当前 pres
 | `USE_QT` + `CMAKE_PREFIX_PATH` | 启用 Qt 样例目标 |
 | `CLANG_DIR` | clang-cl/lld-link 所在 bin 目录（默认 PATH 找） |
 | `ARKARI_DIR` | Arkari 工具链 bin 目录 |
-| `ARKARI_OBFUSCATION` | 混淆旗标（默认全开；空串关闭） |
+| `APP_QT_LINK`（仅 template/qt 分支） | Qt kit 静态/动态切换，见该分支 README |
 | `MSVC_VS_DIR` / `WIN_KITS_ROOT` | MSVC / Windows Kits 定位覆盖 |
 
 ## 已验证
