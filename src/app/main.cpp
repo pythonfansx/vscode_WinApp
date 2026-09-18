@@ -1,39 +1,37 @@
-// -----------------------------------------------------------------------------
-// vscode_WinApp -- Win32 GUI sample showing the build configuration
-// (compiler / CRT linkage / library linkage) produced by corelib.
-// -----------------------------------------------------------------------------
+#include <iostream>
 
-#include <windows.h>
-
-#include <string>
-
-#include "app_core.h"
+#define WINAPP_STRINGIFY_IMPL(value) #value
+#define WINAPP_STRINGIFY(value) WINAPP_STRINGIFY_IMPL(value)
 
 namespace
 {
 
-std::wstring ToWide(const std::string& text)
+const char* CompilerName() noexcept
 {
-    if (text.empty())
-    {
-        return std::wstring();
-    }
-    const int size = MultiByteToWideChar(CP_UTF8, 0, text.data(),
-                                         static_cast<int>(text.size()), nullptr, 0);
-    std::wstring wide(static_cast<size_t>(size), L'\0');
-    MultiByteToWideChar(CP_UTF8, 0, text.data(), static_cast<int>(text.size()),
-                        wide.data(), size);
-    return wide;
+#if defined(__clang__)
+    return "clang-cl " WINAPP_STRINGIFY(__clang_major__) "." WINAPP_STRINGIFY(__clang_minor__);
+#elif defined(_MSC_VER)
+    return "MSVC " WINAPP_STRINGIFY(_MSC_VER);
+#else
+    return "unknown";
+#endif
+}
+
+const char* RuntimeLinkage() noexcept
+{
+#if defined(_DLL)
+    return "dynamic (/MD)";
+#else
+    return "static (/MT)";
+#endif
 }
 
 } // namespace
 
-int WINAPI wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE /*prevInstance*/,
-                    _In_ PWSTR /*cmdLine*/, _In_ int /*showCmd*/)
+int main()
 {
-    UNREFERENCED_PARAMETER(instance);
-
-    const std::wstring report = ToWide(app::BuildInfo());
-    MessageBoxW(nullptr, report.c_str(), L"vscode_WinApp", MB_OK | MB_ICONINFORMATION);
+    std::cout << "vscode_WinApp console executable\n"
+              << "compiler : " << CompilerName() << '\n'
+              << "CRT link : " << RuntimeLinkage() << '\n';
     return 0;
 }
