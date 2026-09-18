@@ -1,36 +1,45 @@
-# -----------------------------------------------------------------------------
-# vscode_WinApp sources: corelib (static/shared switchable) + Win32 GUI app
-# -----------------------------------------------------------------------------
-
-# --- corelib: BUILD_SHARED_LIBS decides .lib vs .dll ---------------------------
-add_library(corelib
-    corelib/app_core.cpp
+add_library(WinAppStatic STATIC
+    lib/winapp.cpp
+    include/winapp/winapp.h
 )
-add_library(app::corelib ALIAS corelib)
+add_library(WinApp::Static ALIAS WinAppStatic)
 
-target_include_directories(corelib
+set_target_properties(WinAppStatic PROPERTIES
+    OUTPUT_NAME winapp_static
+    EXPORT_NAME Static
+)
+
+target_include_directories(WinAppStatic
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/corelib>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
 )
 
-# DLL export plumbing (see app_core.h); static builds need none of these.
-if(BUILD_SHARED_LIBS)
-    target_compile_definitions(corelib PRIVATE WAP_BUILDING)
-    target_compile_definitions(corelib INTERFACE WAP_SHARED)
-endif()
-
-# --- app: Win32 GUI executable --------------------------------------------------
-add_executable(WinApp WIN32
-    app/main.cpp
+install(TARGETS WinAppStatic
+    EXPORT WinAppStaticTargets
+    ARCHIVE DESTINATION lib
+    INCLUDES DESTINATION include
 )
-target_link_libraries(WinApp PRIVATE app::corelib)
-
-
-# --- install layout --------------------------------------------------------------
-install(TARGETS WinApp corelib
-    RUNTIME DESTINATION .           # exe (+ dll when BUILD_SHARED_LIBS=ON)
-    LIBRARY DESTINATION .
-    ARCHIVE DESTINATION .           # import/static libs
+install(DIRECTORY include/ DESTINATION include)
+install(EXPORT WinAppStaticTargets
+    FILE WinAppStaticTargets.cmake
+    NAMESPACE WinApp::
+    DESTINATION lib/cmake/WinAppStatic
 )
-install(FILES corelib/app_core.h DESTINATION include)
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/WinAppStaticConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/WinAppStaticConfig.cmake"
+    INSTALL_DESTINATION lib/cmake/WinAppStatic
+)
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/WinAppStaticConfigVersion.cmake"
+    VERSION "${PROJECT_VERSION}"
+    COMPATIBILITY SameMajorVersion
+)
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/WinAppStaticConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/WinAppStaticConfigVersion.cmake"
+    DESTINATION lib/cmake/WinAppStatic
+)
