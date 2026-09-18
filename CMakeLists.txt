@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(vscode_WinApp
+project(vscode_WinApp_qt
     VERSION 1.0.0
-    DESCRIPTION "Windows user-mode application template: CMake + Ninja, MSVC/Clang/Arkari toolchains, static/dynamic linking"
+    DESCRIPTION "Windows Qt Widgets GUI template"
     LANGUAGES C CXX)
 
 set(CMAKE_C_STANDARD 11)
@@ -21,19 +21,44 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # match how the kit was built), then the runtime mapping is evaluated.
 set(APP_QT_LINK "static" CACHE STRING "Qt kit linkage: static or dynamic")
 set_property(CACHE APP_QT_LINK PROPERTY STRINGS static dynamic)
-set(APP_QT_ROOT "D:/Qt/5.15.2" CACHE PATH
-    "Qt root containing msvc2019_64 and msvc2019_64_static")
+if(NOT APP_QT_LINK STREQUAL "static" AND
+   NOT APP_QT_LINK STREQUAL "dynamic")
+    message(FATAL_ERROR "APP_QT_LINK must be 'static' or 'dynamic'")
+endif()
+
+set(_qt_root_default "")
+if(DEFINED ENV{QT_ROOT} AND NOT "$ENV{QT_ROOT}" STREQUAL "")
+    set(_qt_root_default "$ENV{QT_ROOT}")
+endif()
+set(APP_QT_ROOT "${_qt_root_default}" CACHE PATH
+    "Qt 5.15 root containing msvc2019_64 and msvc2019_64_static")
 
 if(APP_QT_LINK STREQUAL "static")
-    set(_qt_kit "${APP_QT_ROOT}/msvc2019_64_static")
+    set(_qt_kit_name "msvc2019_64_static")
     # Static Qt is built against the static CRT; force /MT to avoid LNK2038.
     set(APP_RUNTIME_LINK "static" CACHE STRING "" FORCE)
 else()
-    set(_qt_kit "${APP_QT_ROOT}/msvc2019_64")
+    set(_qt_kit_name "msvc2019_64")
     # The shared kit is built against /MD; force the dynamic CRT to match.
     set(APP_RUNTIME_LINK "dynamic" CACHE STRING "" FORCE)
 endif()
-list(PREPEND CMAKE_PREFIX_PATH "${_qt_kit}")
+
+if(NOT APP_QT_ROOT STREQUAL "")
+    cmake_path(CONVERT "${APP_QT_ROOT}" TO_CMAKE_PATH_LIST APP_QT_ROOT NORMALIZE)
+    set(_qt_kit "${APP_QT_ROOT}/${_qt_kit_name}")
+    if(NOT EXISTS "${_qt_kit}/lib/cmake/Qt5/Qt5Config.cmake")
+        message(FATAL_ERROR
+            "Qt5 ${APP_QT_LINK} kit not found under '${_qt_kit}'. "
+            "Set APP_QT_ROOT (or QT_ROOT) to the Qt 5.15 root.")
+    endif()
+    list(PREPEND CMAKE_PREFIX_PATH "${_qt_kit}")
+elseif(CMAKE_PREFIX_PATH)
+    set(_qt_kit "${CMAKE_PREFIX_PATH}")
+else()
+    message(FATAL_ERROR
+        "Qt path is required. Set APP_QT_ROOT/QT_ROOT to the Qt 5.15 root, "
+        "or set CMAKE_PREFIX_PATH to the selected Qt kit.")
+endif()
 
 # 1) C runtime linkage:  static (/MT, /MTd)  vs  dynamic (/MD, /MDd).
 #    Maps onto CMAKE_MSVC_RUNTIME_LIBRARY (CMP0091, NEW for >= 3.15 policies).
