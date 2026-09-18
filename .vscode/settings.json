@@ -10,9 +10,12 @@
     // preset; gitignored.
     "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json",
 
-    // IntelliSense: CMake Tools hands cpptools the compile_commands.json of
-    // the active preset -- include paths and defines included.
-    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    // Load the checked-in .clangd policy; compiler paths and resource headers
+    // come from the active compile_commands.json, not editor settings.
+    // clangd owns diagnostics, completion, and navigation.
+    "clangd.arguments": [
+        "--enable-config"
+    ],
 
     "files.associations": {},
     "search.exclude": {

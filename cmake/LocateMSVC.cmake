@@ -82,6 +82,13 @@ if(NOT DEFINED WIN_KITS_ROOT)
         set(WIN_KITS_ROOT "C:/Program Files (x86)/Windows Kits/10")
     endif()
 endif()
+
+# Visual Studio/CMake Tools may provide WindowsSdkDir as a native Windows path
+# (for example C:\Program Files (x86)\Windows Kits\10\). CMake writes
+# CMAKE_RC_COMPILER into CMakeRCCompiler.cmake as a quoted string, so raw
+# backslashes there become invalid escapes such as \P. Normalize before any
+# path is embedded in compiler cache files.
+cmake_path(CONVERT "${WIN_KITS_ROOT}" TO_CMAKE_PATH_LIST WIN_KITS_ROOT NORMALIZE)
 if(NOT WIN_KITS_ROOT MATCHES "/$")
     string(APPEND WIN_KITS_ROOT "/")
 endif()
