@@ -32,11 +32,13 @@ endif()
 option(BUILD_SHARED_LIBS "Build project libraries as DLLs instead of static libs" OFF)
 
 # -----------------------------------------------------------------------------
-# GUI variants live on their own branches (same convention as the
-# vscode_WinDriver template):
+# Template shapes live on dedicated branches:
 #
-#   main          Win32 GUI base (this branch)
-#   template/qt   Qt 6 Widgets edition (-DCMAKE_PREFIX_PATH=<Qt kit>)
+#   main                 native Win32 GUI executable (this branch)
+#   template/console     console executable
+#   template/static-lib  static library
+#   template/shared-lib  Windows DLL
+#   template/qt          Qt Widgets GUI executable
 #
 # -----------------------------------------------------------------------------
 add_subdirectory(src)
