@@ -1,36 +1,48 @@
-# -----------------------------------------------------------------------------
-# vscode_WinApp sources: corelib (static/shared switchable) + Win32 GUI app
-# -----------------------------------------------------------------------------
-
-# --- corelib: BUILD_SHARED_LIBS decides .lib vs .dll ---------------------------
-add_library(corelib
-    corelib/app_core.cpp
+add_library(WinAppShared SHARED
+    lib/winapp.cpp
+    include/winapp/winapp.h
 )
-add_library(app::corelib ALIAS corelib)
+add_library(WinApp::Shared ALIAS WinAppShared)
 
-target_include_directories(corelib
+set_target_properties(WinAppShared PROPERTIES
+    OUTPUT_NAME winapp_shared
+    EXPORT_NAME Shared
+)
+
+target_compile_definitions(WinAppShared PRIVATE WINAPP_SHARED_BUILD)
+target_include_directories(WinAppShared
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/corelib>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
 )
 
-# DLL export plumbing (see app_core.h); static builds need none of these.
-if(BUILD_SHARED_LIBS)
-    target_compile_definitions(corelib PRIVATE WAP_BUILDING)
-    target_compile_definitions(corelib INTERFACE WAP_SHARED)
-endif()
-
-# --- app: Win32 GUI executable --------------------------------------------------
-add_executable(WinApp WIN32
-    app/main.cpp
+install(TARGETS WinAppShared
+    EXPORT WinAppSharedTargets
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    INCLUDES DESTINATION include
 )
-target_link_libraries(WinApp PRIVATE app::corelib)
-
-
-# --- install layout --------------------------------------------------------------
-install(TARGETS WinApp corelib
-    RUNTIME DESTINATION .           # exe (+ dll when BUILD_SHARED_LIBS=ON)
-    LIBRARY DESTINATION .
-    ARCHIVE DESTINATION .           # import/static libs
+install(DIRECTORY include/ DESTINATION include)
+install(EXPORT WinAppSharedTargets
+    FILE WinAppSharedTargets.cmake
+    NAMESPACE WinApp::
+    DESTINATION lib/cmake/WinAppShared
 )
-install(FILES corelib/app_core.h DESTINATION include)
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/WinAppSharedConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/WinAppSharedConfig.cmake"
+    INSTALL_DESTINATION lib/cmake/WinAppShared
+)
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/WinAppSharedConfigVersion.cmake"
+    VERSION "${PROJECT_VERSION}"
+    COMPATIBILITY SameMajorVersion
+)
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/WinAppSharedConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/WinAppSharedConfigVersion.cmake"
+    DESTINATION lib/cmake/WinAppShared
+)
